@@ -14,7 +14,11 @@ with EmasLogic
 with RastriginProblem {
 
   def main(args: Array[String]) {
-    run(5 seconds)
+//    run(5 seconds)
+
+    val list = List.fill(10)(10)
+    println(list.slice(0,5))
+    println(list.take(5))
   }
 
 }
