@@ -37,9 +37,7 @@ trait SegmentsLengthMutation {
 
       // We don't want the change the '1' diff if it is present
       val unitIndex = diffs.indexOf(1)
-
       val allIndexes = (0 until diffs.length).toSet
-//      val otherThanUnit = allIndexes - unitIndex
 
       // We select one more in case unitIndex is present
       val randomIndexes = randomData.nextPermutation(diffs.length, diffsToChange + 1).toSet
@@ -49,9 +47,10 @@ trait SegmentsLengthMutation {
 
       val diffsToKeep = indexesToKeep.map(diffs(_))
 
-      val randomDiffs = randomIntStream(2, maxMarkSize)
+
+      val randomDiffs = randomData.nextPermutation(maxMarkSize, maxMarkSize)
       val diffsToChooseFrom = randomDiffs.filter(!diffsToKeep.contains(_))
-      val newDiffs = diffsToChooseFrom.distinct.take(diffsToChange).toList
+      val newDiffs = diffsToChooseFrom.distinct.take(diffsToChange)
 
       for ((i,d) <- indexesToChange.zip(newDiffs)) {
         diffs(i) = d
