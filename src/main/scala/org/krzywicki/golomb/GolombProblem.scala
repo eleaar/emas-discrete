@@ -1,7 +1,7 @@
 package org.krzywicki.golomb
 
 import org.apache.commons.math3.random.RandomDataGenerator
-import org.krzywicki.golomb.operators.{OnePointCrossover, SegmentsLengthMutation}
+import org.krzywicki.golomb.operators.{TabuSearchStrategy, OnePointCrossover, SegmentsLengthMutation}
 import org.krzywicki.golomb.problem._
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
 import pl.edu.agh.scalamas.genetic.{GeneticTransformer, GeneticOps, GeneticProblem}
@@ -13,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
  * Created by krzywick on 2015-04-01.
  */
 
-trait GolombProblem extends GeneticProblem with SegmentsLengthMutation with OnePointCrossover {
+trait GolombProblem extends GeneticProblem with SegmentsLengthMutation with OnePointCrossover with TabuSearchStrategy {
 
   this: AgentRuntimeComponent with RandomGeneratorComponent =>
 
@@ -46,7 +46,7 @@ trait GolombProblem extends GeneticProblem with SegmentsLengthMutation with OneP
       IndirectRuler(marks)
     }
 
-    def evaluate(solution: Solution) = - RulerEvaluator.evaluate(solution)
+    def evaluate(solution: Solution) = - search(solution)
 
     val minimal = 10000.0
 
