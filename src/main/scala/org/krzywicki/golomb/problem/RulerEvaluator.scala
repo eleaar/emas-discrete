@@ -19,7 +19,7 @@ object RulerEvaluator {
 
   def evaluate(ruler: Ruler): Double = {
     // FitnessCount.increment
-    return calculateViolations(ruler.getDirectRepresentation) * 375 - ruler.length
+    return calculateViolations(ruler.directRepresentation.toArray) * 375 - ruler.length
   }
 
   /**

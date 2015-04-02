@@ -1,5 +1,6 @@
 package org.krzywicki
 
+import org.krzywicki.golomb.GolombProblem
 import pl.edu.agh.scalamas.app.SequentialStack
 import pl.edu.agh.scalamas.emas.EmasLogic
 import pl.edu.agh.scalamas.genetic.RastriginProblem
@@ -11,14 +12,10 @@ import scala.concurrent.duration._
  */
 object SequentialApp extends SequentialStack
 with EmasLogic
-with RastriginProblem {
+with GolombProblem {
 
   def main(args: Array[String]) {
-//    run(5 seconds)
-
-    val list = List.fill(10)(10)
-    println(list.slice(0,5))
-    println(list.take(5))
+    run(5 seconds)
   }
 
 }

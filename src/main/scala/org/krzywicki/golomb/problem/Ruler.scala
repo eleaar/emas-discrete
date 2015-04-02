@@ -1,71 +1,42 @@
-/*
- * This file is a part of ogronage project.
- * (c) Copyright 2012, Specter
- * All rights reserved. Check the documentation for licensing terms.
- */
-/*
- * File: Ruler.scala
- * Created: 2012-12-13
- * Author: Specter
- */
-
 package org.krzywicki.golomb.problem
 
-/**
- * Methods that returns ruler's representation actually returns reference to stored array!
- *
- * @author Specter
- */
-class Ruler(marks: Array[Int], directed: Boolean) {
+import scala.collection.mutable.ArrayBuffer
 
-  def this(marks: Array[Int]) = this(marks, true)
 
-  private var directRepresentation: Array[Int] = _
+trait Ruler {
 
-  private var indirectRepresentation: Array[Int] = _
+  def directRepresentation: Seq[Int]
 
-  if (directed) {
-    fillFromDirect(marks)
-  } else {
-    fillFromIndirect(marks)
-  }
+  def indirectRepresentation: Seq[Int]
 
-  // var wrapper = new RulerWrapper(this)
+  def length: Int
 
-  def length() = directRepresentation(directRepresentation.length - 1)
-
-  def marksCount() = directRepresentation.length
-
-  def getRepresentation() = indirectRepresentation
-
-  def getDirectRepresentation() = directRepresentation
-
-  def setRepresentation(indirectRepresentation: Array[Int]) {
-    fillFromIndirect(indirectRepresentation)
-  }
-
-  private def fillFromIndirect(marks: Array[Int]) {
-    val size = marks.length
-    indirectRepresentation = marks.clone
-    directRepresentation = new Array[Int](size + 1)
-    for (i <- 0 until size) {
-      directRepresentation(i + 1) = marks(i) + directRepresentation(i)
-    }
-    // wrapper = new RulerWrapper(this)
-  }
-
-  def setDirectRepresentation(directRepresentation: Array[Int]) {
-    fillFromDirect(directRepresentation)
-  }
-
-  private def fillFromDirect(marks: Array[Int]) {
-    val size = marks.length
-    directRepresentation = marks.clone
-    indirectRepresentation = new Array[Int](size - 1)
-    for (i <- 1 until size) {
-      indirectRepresentation(i - 1) = marks(i) - marks(i - 1)
-    }
-    // wrapper = new RulerWrapper(this)
-  }
-
+  def order: Int
 }
+
+
+case class IndirectRuler(diffs: Seq[Int]) extends Ruler {
+
+  val indirectRepresentation = diffs
+  lazy val directRepresentation = 0 +: diffs.scanLeft(0)(_ + _)
+
+  val length = indirectRepresentation.length + 1
+  lazy val order = directRepresentation.last
+}
+
+case class DirectRuler(positions: Seq[Int]) extends Ruler {
+
+  val directRepresentation = positions
+  lazy val indirectRepresentation = {
+    val size = positions.length
+    val tmp = new ArrayBuffer[Int](size - 1)
+    for (i <- 1 until size) {
+      tmp(i - 1) = positions(i) - positions(i - 1)
+    }
+    tmp
+  }
+
+  val length = directRepresentation.length
+  lazy val order = directRepresentation.last
+}
+
