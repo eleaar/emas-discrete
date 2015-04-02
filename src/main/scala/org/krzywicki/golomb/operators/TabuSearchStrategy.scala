@@ -31,13 +31,13 @@ trait TabuSearchStrategy {
 
   def maxIterationCount = agentRuntime.config.getInt("genetic.golomb.iterationCount")
 
-  def search(ruler: Ruler): Double = {
+  def search(ruler: Ruler): Int = {
     if (maxIterationCount < 1) {
-      return 1.0
+      return 1
     }
 
     var bestRuler = DirectRuler(ruler.directRepresentation.toBuffer)
-    var bestRulerViolation = calculateViolations(ruler.directRepresentation.toArray)
+    var bestRulerViolation = -distanceViolations(ruler.directRepresentation.toArray)
 
     var iteration = 0
     val tabu = new HashMap[TabuItem, Int]
@@ -74,7 +74,7 @@ trait TabuSearchStrategy {
 
   private def createChange(newRepresentation: Array[Int], i: Int, mark: Int): TabuItem = {
     newRepresentation(i) = mark
-    val violations = calculateViolations(newRepresentation)
+    val violations = -distanceViolations(newRepresentation)
     return new TabuItem(i, mark, violations)
   }
 

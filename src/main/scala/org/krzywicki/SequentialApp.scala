@@ -15,7 +15,7 @@ with EmasLogic
 with GolombProblem {
 
   def main(args: Array[String]) {
-    run(5 seconds)
+    run(10 seconds)
   }
 
 }

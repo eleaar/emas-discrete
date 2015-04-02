@@ -18,10 +18,10 @@ trait Ruler {
 case class IndirectRuler(diffs: Seq[Int]) extends Ruler {
 
   val indirectRepresentation = diffs
-  lazy val directRepresentation = 0 +: diffs.scanLeft(0)(_ + _)
+  lazy val directRepresentation = diffs.scanLeft(0)(_ + _)
 
-  val length = indirectRepresentation.length + 1
-  lazy val order = directRepresentation.last
+  val order = indirectRepresentation.length + 1
+  lazy val length = directRepresentation.last
 }
 
 case class DirectRuler(positions: Seq[Int]) extends Ruler {
@@ -36,7 +36,7 @@ case class DirectRuler(positions: Seq[Int]) extends Ruler {
     tmp
   }
 
-  val length = directRepresentation.length
-  lazy val order = directRepresentation.last
+  val order = directRepresentation.length
+  lazy val length = directRepresentation.last
 }
 

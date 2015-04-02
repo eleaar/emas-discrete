@@ -29,7 +29,7 @@ trait GolombProblem extends GeneticProblem with SegmentsLengthMutation with OneP
   class GolombOps extends GeneticOps[GolombOps] {
 
     type Solution = Ruler
-    type Evaluation = Double
+    type Evaluation = Int
 
     // Mark '0' is illegal, mark '1' will be in ALL rulers, we need to permutate only n - 1 numbers
     val possibleMarks = (2 to maxMarkSize).toList
@@ -48,9 +48,9 @@ trait GolombProblem extends GeneticProblem with SegmentsLengthMutation with OneP
 
     def evaluate(solution: Solution) = - search(solution)
 
-    val minimal = 10000.0
+    val minimal = maxMarkSize * maxMarkSize / 2
 
-    val ordering = Ordering[Double].reverse
+    val ordering = Ordering[Int].reverse
 
     def transform(solution: Solution) = {
       mutationStrategy.mutateSolution(solution)
