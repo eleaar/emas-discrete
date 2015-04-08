@@ -11,118 +11,122 @@
 
 package org.krzywicki.golomb.operators
 
-import org.krzywicki.golomb.problem.{DirectRuler, IndirectRuler, RulerEvaluator, Ruler}
+import org.apache.commons.math3.random.RandomDataGenerator
+import org.krzywicki.golomb.problem.Ruler
 import org.krzywicki.golomb.problem.RulerEvaluator._
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 
 import scala.collection.mutable.HashMap
-import scala.collection.mutable.Map
 
-/**
- *
- * @author Specter
- */
+
+case class TabuItem(index: Int, mark: Int, violation: Int)
+
+class TabooFilter(randomData: RandomDataGenerator) {
+
+  private var iteration = 0
+  private val map = new HashMap[TabuItem, Int]
+
+  def setTaboo(item: TabuItem) {
+    val duration = randomData.nextInt(4, 100)
+    map.put(item, iteration + duration)
+  }
+
+  def isTaboo(item: TabuItem) = {
+    map.get(item) match {
+      case None => false
+      case Some(limit) if iteration > limit => false
+      case Some(limit) if iteration <= limit => true
+    }
+  }
+
+  def flush(): Unit = {
+    iteration += 1
+  }
+}
+
+
 trait TabuSearchStrategy {
 
   this: AgentRuntimeComponent with RandomGeneratorComponent =>
 
-//  private var memConf: MemeticConfigurator[Ruler, Int] = _
-
-  def maxIterationCount = agentRuntime.config.getInt("genetic.golomb.iterationCount")
+  lazy val maxIterationCount = agentRuntime.config.getInt("genetic.golomb.iterationCount")
+  require(maxIterationCount > 0)
 
   def search(ruler: Ruler): Int = {
-    if (maxIterationCount < 1) {
-      return 1
-    }
-
-    var bestRuler = DirectRuler(ruler.directRepresentation.toBuffer)
-    var bestRulerViolation = -distanceViolations(ruler.directRepresentation.toArray)
-
+    val filter = new TabooFilter(randomData)
+    var bestRuler = ruler.directRepresentation
+    var bestRulerViolation = distanceViolations(bestRuler)
     var iteration = 0
-    val tabu = new HashMap[TabuItem, Int]
-
     var shouldStop = false
-    while (iteration <= maxIterationCount && bestRulerViolation < 0 && !shouldStop) {
-      val bestChange = getBestChange(bestRuler, bestRulerViolation, iteration, tabu)
-      bestChange match {
-        case change: TabuItem =>
-          val it = randRange(4, 100)
-          tabu.put(change, iteration + it)
-          if (change.newViolation > bestRulerViolation) {
-            val representation = bestRuler.directRepresentation.toArray
-            representation(change.index) = change.newMark
-            bestRuler = DirectRuler(representation)
-            bestRulerViolation = change.newViolation
+
+    while (iteration <= maxIterationCount && bestRulerViolation > 0 && !shouldStop) {
+      val change = findChange(bestRuler, filter)
+      change match {
+        case Some(tabuItem) =>
+          filter.setTaboo(tabuItem)
+          if (tabuItem.violation < bestRulerViolation) {
+            val representation = bestRuler.toBuffer
+            representation(tabuItem.index) = tabuItem.mark
+            bestRuler = representation.toIndexedSeq
+            bestRulerViolation = tabuItem.violation
           }
-        case _ => shouldStop = true
+
+        case None => shouldStop = true
       }
+      filter.flush()
       iteration += 1
     }
 
-
-//      memConf.put(ruler, bestRuler)
-
-
-    return bestRulerViolation * 375 - ruler.length
+    return ruler.length + 375 * bestRulerViolation
   }
 
-  private def randRange(lowerInclusive: Int, upperInclusive: Int): Int = {
-    val number = upperInclusive - lowerInclusive + 1
-    return random.nextInt(number) + lowerInclusive
-  }
+  private def findChange(ruler: IndexedSeq[Int], filter: TabooFilter): Option[TabuItem] = {
+    var bestChange: Option[TabuItem] = None
+    val size = ruler.length
 
-  private def createChange(newRepresentation: Array[Int], i: Int, mark: Int): TabuItem = {
-    newRepresentation(i) = mark
-    val violations = -distanceViolations(newRepresentation)
-    return new TabuItem(i, mark, violations)
-  }
-
-  private def validateChange(proposalChange: TabuItem, bestChange: TabuItem, bestRulerViolation: Int, iteration: Int, tabu: Map[TabuItem, Int]): TabuItem = {
-    // 1 in comparison means that proposalChange has less violations - is better
-    val meetsCriteria = bestChange == null || bestChange.compareTo(proposalChange) == 1
-    tabu.get(proposalChange) match {
-      case Some(it: Int) =>
-        if (it <= iteration && meetsCriteria) {
-          return proposalChange
-        }
-      case _ =>
-    }
-    if (proposalChange.newViolation > bestRulerViolation && meetsCriteria) {
-      return proposalChange
-    }
-    return bestChange
-  }
-
-  private def getBestChange(ruler: Ruler, bestRulerViolation: Int, iteration: Int, tabu: Map[TabuItem, Int]): TabuItem = {
-    var bestChange: TabuItem = null
-
-    val representation = ruler.directRepresentation
-    val size = representation.length
     // Changes to '0' mark moves the ruler
     // Changing from 1st to (n - 1)th mark
     var i = 1
     val sizeMinusOne = size - 1
     while (i < sizeMinusOne) {
-      var j = representation(i - 1) + 1
-      val maxIdx = representation(i + 1) - 1
+      var j = ruler(i - 1) + 1
+      val maxIdx = ruler(i + 1) - 1
       while (j <= maxIdx) {
-        val proposalChange = createChange(ruler.directRepresentation.toArray.clone, i, j)
-        bestChange = validateChange(proposalChange, bestChange, bestRulerViolation, iteration, tabu)
+        val currentChange = createChange(ruler, i, j)
+        bestChange = chooseBetterChange(currentChange, bestChange, filter)
         j += 1
       }
       i += 1
     }
     // Changing last mark
-    i = representation(size - 2) + 1
-    val maxIdx = representation(sizeMinusOne) - 1
+    i = ruler(size - 2) + 1
+    val maxIdx = ruler(sizeMinusOne) - 1
     while (i <= maxIdx) {
-      val proposalChange = createChange(ruler.directRepresentation.toArray.clone, sizeMinusOne, i)
-      bestChange = validateChange(proposalChange, bestChange, bestRulerViolation, iteration, tabu)
+      val currentChange = createChange(ruler, sizeMinusOne, i)
+      bestChange = chooseBetterChange(currentChange, bestChange, filter)
       i += 1
     }
 
     return bestChange
   }
 
+  private def createChange(representation: IndexedSeq[Int], i: Int, mark: Int): TabuItem = {
+    val newRepresentation = representation.toBuffer
+    newRepresentation(i) = mark
+    val violations = distanceViolations(newRepresentation.toIndexedSeq)
+    TabuItem(i, mark, violations)
+  }
+
+  private def chooseBetterChange(currentChange: TabuItem, bestChange: Option[TabuItem], filter: TabooFilter): Option[TabuItem] = {
+    if(filter.isTaboo(currentChange)) {
+      bestChange
+    } else {
+      bestChange match {
+        case None => Some(currentChange)
+        case Some(previousChange) if currentChange.violation < previousChange.violation  => Some(currentChange)
+        case Some(previousChange) if currentChange.violation >= previousChange.violation => bestChange
+      }
+    }
+  }
 }
