@@ -1,6 +1,5 @@
 package org.krzywicki.golomb
 
-import org.krzywicki.golomb.problem.Ruler
 import pl.edu.agh.scalamas.genetic.GeneticEvaluator
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 import pl.edu.agh.scalamas.util.Util._
@@ -29,7 +28,7 @@ trait GolombEvaluatorComponent {
       val marks = ArrayBuffer() ++ possibleMarks.shuffled.take(countOfMarks - 2)
       val position = random.nextInt(marks.size + 1)
       marks.insert(position, 1)
-      Ruler(marks)
+      marks
     }
 
     def evaluate(solution: GolombOps#Solution) = {
@@ -51,7 +50,7 @@ object GolombEvaluator {
   /**
    * Translate an indirect ruler (sequence of mark distances) into a direct ruler (sequence of mark positions).
    */
-  def decode(ruler: GolombOps#Solution) = ruler.indirectRepresentation.scanLeft(0)(_ + _)
+  def decode(solution: GolombOps#Solution) = solution.scanLeft(0)(_ + _)
 
   def evaluateWithViolations(marks: IndexedSeq[Int], violations: Int) = {
     marks.last + 375 * violations

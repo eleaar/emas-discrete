@@ -1,13 +1,12 @@
 package org.krzywicki.golomb
 
-import org.krzywicki.golomb.problem.Ruler
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
 import pl.edu.agh.scalamas.genetic.{GeneticOps, GeneticProblem}
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 
 trait GolombOps extends GeneticOps[GolombOps] {
 
-  type Solution = Ruler
+  type Solution = IndexedSeq[Int]
   type Evaluation = Int
 
 }

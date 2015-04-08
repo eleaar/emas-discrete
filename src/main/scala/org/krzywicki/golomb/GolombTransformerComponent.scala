@@ -1,6 +1,5 @@
 package org.krzywicki.golomb
 
-import org.krzywicki.golomb.problem.Ruler
 import pl.edu.agh.scalamas.genetic.GeneticTransformer
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 
@@ -22,7 +21,7 @@ trait GolombTransformerComponent {
      * @return
      */
     override def transform(solution: GolombOps#Solution) = {
-      val diffs = solution.indirectRepresentation.toBuffer
+      val diffs = solution.toBuffer
 
       // We change at least one and at most half of the diffs
       val diffsToChange = randomData.nextInt(1, diffs.length / 2)
@@ -48,20 +47,17 @@ trait GolombTransformerComponent {
         diffs(i) = d
       }
 
-      Ruler(diffs.toIndexedSeq)
+      diffs.toIndexedSeq
     }
 
     override def transform(solution1: GolombOps#Solution, solution2: GolombOps#Solution) = {
-      val first = solution1.indirectRepresentation
-      val second = solution2.indirectRepresentation
-
-      val minSize = math.min(first.length, second.length)
+      val minSize = math.min(solution1.length, solution2.length)
       val cutPoint = randomData.nextInt(1, minSize - 1)
 
-      val (firstHead, firstTail) = first.splitAt(cutPoint)
-      val (secondHead, secondTail) = second.splitAt(cutPoint)
+      val (firstHead, firstTail) = solution1.splitAt(cutPoint)
+      val (secondHead, secondTail) = solution2.splitAt(cutPoint)
 
-      (Ruler(firstHead ++ secondTail), Ruler(secondHead ++ firstTail))
+      (firstHead ++ secondTail, secondHead ++ firstTail)
     }
   }
 
