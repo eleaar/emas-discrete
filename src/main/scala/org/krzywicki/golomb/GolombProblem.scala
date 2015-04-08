@@ -1,6 +1,6 @@
 package org.krzywicki.golomb
 
-import org.krzywicki.golomb.operators.{OnePointCrossover, SegmentsLengthMutation, TabuSearchStrategy}
+import org.krzywicki.golomb.operators.{OnePointCrossover, SegmentsLengthMutation, TabooSearchStrategy}
 import org.krzywicki.golomb.problem._
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
 import pl.edu.agh.scalamas.genetic.{GeneticOps, GeneticProblem}
@@ -14,7 +14,7 @@ import scala.math.Ordering
  * Created by krzywick on 2015-04-01.
  */
 
-trait GolombProblem extends GeneticProblem with SegmentsLengthMutation with OnePointCrossover with TabuSearchStrategy {
+trait GolombProblem extends GeneticProblem with SegmentsLengthMutation with OnePointCrossover with TabooSearchStrategy {
 
   this: AgentRuntimeComponent with RandomGeneratorComponent =>
 

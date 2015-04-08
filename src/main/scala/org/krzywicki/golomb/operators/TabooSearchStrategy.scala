@@ -4,7 +4,7 @@
  * All rights reserved. Check the documentation for licensing terms.
  */
 /*
- * File: TabuSearchStrategy.scala
+ * File: TabooSearchStrategy.scala
  * Created: 2012-12-18
  * Author: Specter
  */
@@ -46,7 +46,7 @@ class TabooFilter[G](randomData: RandomDataGenerator) {
 }
 
 
-trait TabuSearchStrategy {
+trait TabooSearchStrategy {
 
   this: AgentRuntimeComponent with RandomGeneratorComponent =>
 
