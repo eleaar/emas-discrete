@@ -11,7 +11,7 @@
 
 package org.krzywicki.golomb.operators
 
-import org.krzywicki.golomb.problem.{IndirectRuler, Ruler}
+import org.krzywicki.golomb.problem.{Ruler}
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 
 trait SegmentsLengthMutation {
@@ -51,7 +51,7 @@ trait SegmentsLengthMutation {
         diffs(i) = d
       }
 
-      IndirectRuler(diffs.toIndexedSeq)
+      Ruler(diffs.toIndexedSeq)
     }
 
     def randomIntStream(min: Int, max: Int) = Stream.continually(randomData.nextInt(min, max))

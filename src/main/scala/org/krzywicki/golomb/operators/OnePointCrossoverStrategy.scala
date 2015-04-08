@@ -11,7 +11,7 @@
 
 package org.krzywicki.golomb.operators
 
-import org.krzywicki.golomb.problem.{IndirectRuler, Ruler}
+import org.krzywicki.golomb.problem.{Ruler}
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 
 trait OnePointCrossover {
@@ -32,7 +32,7 @@ trait OnePointCrossover {
       val (firstHead, firstTail) = first.splitAt(cutPoint)
       val (secondHead, secondTail) = second.splitAt(cutPoint)
 
-      (IndirectRuler(firstHead ++ secondTail), IndirectRuler(secondHead ++ firstTail))
+      (Ruler(firstHead ++ secondTail), Ruler(secondHead ++ firstTail))
     }
   }
 }

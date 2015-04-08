@@ -13,7 +13,7 @@ package org.krzywicki.golomb.operators
 
 import org.apache.commons.math3.random.RandomDataGenerator
 import org.krzywicki.golomb.problem.Ruler
-import org.krzywicki.golomb.problem.RulerEvaluator._
+import org.krzywicki.golomb.problem.RulerEvaluator
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 
@@ -55,8 +55,8 @@ trait TabooSearchStrategy {
 
   def search(ruler: Ruler): Int = {
     val filter = new TabooFilter[MarkChange](randomData)
-    var bestRuler = ruler.directRepresentation
-    var bestRulerViolation = violations(bestRuler)
+    var bestRuler = RulerEvaluator.decode(ruler)
+    var bestRulerViolation = RulerEvaluator.violations(bestRuler)
     var iteration = 0
     var shouldStop = false
 
@@ -78,13 +78,14 @@ trait TabooSearchStrategy {
       iteration += 1
     }
 
-    return ruler.length + 375 * bestRulerViolation
+    // TODO: move to evaluator
+    return bestRuler.last + 375 * bestRulerViolation
   }
 
   private def findChange(marks: IndexedSeq[Int], filter: TabooFilter[MarkChange]): Option[MarkChange] = {
     var bestChange: Option[MarkChange] = None
     val size = marks.length
-    val distances = distancesMap(marks)
+    val distances = RulerEvaluator.distancesMap(marks)
 
     // Changes to '0' mark moves the ruler
     // Changing from 1st to (n - 1)th mark
@@ -112,8 +113,8 @@ trait TabooSearchStrategy {
   }
 
   private def createChange(marks: IndexedSeq[Int], distances: Array[Int], index: Int, newMark: Int): MarkChange = {
-    val newDistances = distancesMapAfterFlip(marks, distances, index, newMark)
-    MarkChange(index, newMark, distanceViolations(newDistances))
+    val newDistances = RulerEvaluator.distancesMapAfterFlip(marks, distances, index, newMark)
+    MarkChange(index, newMark, RulerEvaluator.distanceViolations(newDistances))
   }
 
   private def chooseBetterChange(currentChange: MarkChange, bestChange: Option[MarkChange], filter: TabooFilter[MarkChange]): Option[MarkChange] = {
