@@ -20,19 +20,19 @@ import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 import scala.collection.mutable.HashMap
 
 
-case class TabuItem(index: Int, mark: Int, violation: Int)
+case class MarkChange(index: Int, mark: Int, violation: Int)
 
-class TabooFilter(randomData: RandomDataGenerator) {
+class TabooFilter[G](randomData: RandomDataGenerator) {
 
   private var iteration = 0
-  private val map = new HashMap[TabuItem, Int]
+  private val map = new HashMap[G, Int]
 
-  def setTaboo(item: TabuItem) {
+  def setTaboo(item: G) {
     val duration = randomData.nextInt(4, 100)
     map.put(item, iteration + duration)
   }
 
-  def isTaboo(item: TabuItem) = {
+  def isTaboo(item: G) = {
     map.get(item) match {
       case None => false
       case Some(limit) if iteration > limit => false
@@ -54,7 +54,7 @@ trait TabuSearchStrategy {
   require(maxIterationCount > 0)
 
   def search(ruler: Ruler): Int = {
-    val filter = new TabooFilter(randomData)
+    val filter = new TabooFilter[MarkChange](randomData)
     var bestRuler = ruler.directRepresentation
     var bestRulerViolation = distanceViolations(bestRuler)
     var iteration = 0
@@ -81,8 +81,8 @@ trait TabuSearchStrategy {
     return ruler.length + 375 * bestRulerViolation
   }
 
-  private def findChange(ruler: IndexedSeq[Int], filter: TabooFilter): Option[TabuItem] = {
-    var bestChange: Option[TabuItem] = None
+  private def findChange(ruler: IndexedSeq[Int], filter: TabooFilter[MarkChange]): Option[MarkChange] = {
+    var bestChange: Option[MarkChange] = None
     val size = ruler.length
 
     // Changes to '0' mark moves the ruler
@@ -111,14 +111,14 @@ trait TabuSearchStrategy {
     return bestChange
   }
 
-  private def createChange(representation: IndexedSeq[Int], i: Int, mark: Int): TabuItem = {
+  private def createChange(representation: IndexedSeq[Int], i: Int, mark: Int): MarkChange = {
     val newRepresentation = representation.toBuffer
     newRepresentation(i) = mark
     val violations = distanceViolations(newRepresentation.toIndexedSeq)
-    TabuItem(i, mark, violations)
+    MarkChange(i, mark, violations)
   }
 
-  private def chooseBetterChange(currentChange: TabuItem, bestChange: Option[TabuItem], filter: TabooFilter): Option[TabuItem] = {
+  private def chooseBetterChange(currentChange: MarkChange, bestChange: Option[MarkChange], filter: TabooFilter[MarkChange]): Option[MarkChange] = {
     if(filter.isTaboo(currentChange)) {
       bestChange
     } else {
