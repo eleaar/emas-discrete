@@ -6,7 +6,7 @@ import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 
 trait GolombOps extends GeneticOps[GolombOps] {
 
-  type Solution = IndexedSeq[Int]
+  type Solution = Array[Int]
   type Evaluation = Int
 
 }

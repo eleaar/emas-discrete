@@ -21,7 +21,7 @@ trait GolombTransformerComponent {
      * @return
      */
     override def transform(solution: GolombOps#Solution) = {
-      val diffs = solution.toBuffer
+      val diffs = solution.clone()
 
       // We change at least one and at most half of the diffs
       val diffsToChange = randomData.nextInt(1, diffs.length / 2)
@@ -47,7 +47,7 @@ trait GolombTransformerComponent {
         diffs(i) = d
       }
 
-      diffs.toIndexedSeq
+      diffs
     }
 
     override def transform(solution1: GolombOps#Solution, solution2: GolombOps#Solution) = {

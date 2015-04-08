@@ -30,9 +30,8 @@ trait GolombLocalSearchComponent extends GolombEvaluatorComponent {
           case Some(tabuItem) =>
             filter.setTaboo(tabuItem)
             if (tabuItem.violation < bestRulerViolation) {
-              val representation = bestRuler.toBuffer
-              representation(tabuItem.index) = tabuItem.mark
-              bestRuler = representation.toIndexedSeq
+              bestRuler = bestRuler.clone()
+              bestRuler(tabuItem.index) = tabuItem.mark
               bestRulerViolation = tabuItem.violation
             }
 

@@ -28,7 +28,7 @@ trait GolombEvaluatorComponent {
       val marks = ArrayBuffer() ++ possibleMarks.shuffled.take(countOfMarks - 2)
       val position = random.nextInt(marks.size + 1)
       marks.insert(position, 1)
-      marks
+      marks.toArray
     }
 
     def evaluate(solution: GolombOps#Solution) = {
