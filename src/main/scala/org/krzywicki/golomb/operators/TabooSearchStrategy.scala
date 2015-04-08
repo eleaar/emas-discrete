@@ -56,7 +56,7 @@ trait TabooSearchStrategy {
   def search(ruler: Ruler): Int = {
     val filter = new TabooFilter[MarkChange](randomData)
     var bestRuler = ruler.directRepresentation
-    var bestRulerViolation = distanceViolations(bestRuler)
+    var bestRulerViolation = violations(bestRuler)
     var iteration = 0
     var shouldStop = false
 
@@ -81,29 +81,29 @@ trait TabooSearchStrategy {
     return ruler.length + 375 * bestRulerViolation
   }
 
-  private def findChange(ruler: IndexedSeq[Int], filter: TabooFilter[MarkChange]): Option[MarkChange] = {
+  private def findChange(marks: IndexedSeq[Int], filter: TabooFilter[MarkChange]): Option[MarkChange] = {
     var bestChange: Option[MarkChange] = None
-    val size = ruler.length
+    val size = marks.length
+    val distances = distancesMap(marks)
 
     // Changes to '0' mark moves the ruler
     // Changing from 1st to (n - 1)th mark
     var i = 1
-    val sizeMinusOne = size - 1
-    while (i < sizeMinusOne) {
-      var j = ruler(i - 1) + 1
-      val maxIdx = ruler(i + 1) - 1
+    while (i < size - 1) {
+      var j = marks(i - 1) + 1
+      val maxIdx = marks(i + 1) - 1
       while (j <= maxIdx) {
-        val currentChange = createChange(ruler, i, j)
+        val currentChange = createChange(marks, distances, i, j)
         bestChange = chooseBetterChange(currentChange, bestChange, filter)
         j += 1
       }
       i += 1
     }
     // Changing last mark
-    i = ruler(size - 2) + 1
-    val maxIdx = ruler(sizeMinusOne) - 1
+    i = marks(size - 2) + 1
+    val maxIdx = marks(size - 1) - 1
     while (i <= maxIdx) {
-      val currentChange = createChange(ruler, sizeMinusOne, i)
+      val currentChange = createChange(marks, distances, size - 1, i)
       bestChange = chooseBetterChange(currentChange, bestChange, filter)
       i += 1
     }
@@ -111,20 +111,18 @@ trait TabooSearchStrategy {
     return bestChange
   }
 
-  private def createChange(representation: IndexedSeq[Int], i: Int, mark: Int): MarkChange = {
-    val newRepresentation = representation.toBuffer
-    newRepresentation(i) = mark
-    val violations = distanceViolations(newRepresentation.toIndexedSeq)
-    MarkChange(i, mark, violations)
+  private def createChange(marks: IndexedSeq[Int], distances: Array[Int], index: Int, newMark: Int): MarkChange = {
+    val newDistances = distancesMapAfterFlip(marks, distances, index, newMark)
+    MarkChange(index, newMark, distanceViolations(newDistances))
   }
 
   private def chooseBetterChange(currentChange: MarkChange, bestChange: Option[MarkChange], filter: TabooFilter[MarkChange]): Option[MarkChange] = {
-    if(filter.isTaboo(currentChange)) {
+    if (filter.isTaboo(currentChange)) {
       bestChange
     } else {
       bestChange match {
         case None => Some(currentChange)
-        case Some(previousChange) if currentChange.violation < previousChange.violation  => Some(currentChange)
+        case Some(previousChange) if currentChange.violation < previousChange.violation => Some(currentChange)
         case Some(previousChange) if currentChange.violation >= previousChange.violation => bestChange
       }
     }
