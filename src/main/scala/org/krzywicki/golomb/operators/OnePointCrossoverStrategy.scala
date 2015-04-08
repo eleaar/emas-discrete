@@ -23,8 +23,8 @@ trait OnePointCrossover {
   object OnePointCrossoverStrategy {
 
     def recombine(ruler1: Ruler, ruler2: Ruler) = {
-      val first = ruler1.indirectRepresentation.toBuffer
-      val second = ruler2.indirectRepresentation.toBuffer
+      val first = ruler1.indirectRepresentation
+      val second = ruler2.indirectRepresentation
 
       val minSize = math.min(first.length, second.length)
       val cutPoint = randomData.nextInt(1, minSize - 1)

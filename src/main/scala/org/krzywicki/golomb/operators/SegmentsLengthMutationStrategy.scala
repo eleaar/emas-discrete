@@ -14,11 +14,6 @@ package org.krzywicki.golomb.operators
 import org.krzywicki.golomb.problem.{IndirectRuler, Ruler}
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 
-import scala.collection.{mutable, Set}
-import scala.collection.mutable.HashSet
-
-import scala.collection.JavaConversions._
-
 trait SegmentsLengthMutation {
 
   this: RandomGeneratorComponent =>
@@ -56,7 +51,7 @@ trait SegmentsLengthMutation {
         diffs(i) = d
       }
 
-      IndirectRuler(diffs)
+      IndirectRuler(diffs.toIndexedSeq)
     }
 
     def randomIntStream(min: Int, max: Int) = Stream.continually(randomData.nextInt(min, max))

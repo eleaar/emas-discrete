@@ -5,9 +5,9 @@ import scala.collection.mutable.ArrayBuffer
 
 trait Ruler {
 
-  def directRepresentation: Seq[Int]
+  def directRepresentation: IndexedSeq[Int]
 
-  def indirectRepresentation: Seq[Int]
+  def indirectRepresentation: IndexedSeq[Int]
 
   def length: Int
 
@@ -15,7 +15,7 @@ trait Ruler {
 }
 
 
-case class IndirectRuler(diffs: Seq[Int]) extends Ruler {
+case class IndirectRuler(diffs: IndexedSeq[Int]) extends Ruler {
 
   val indirectRepresentation = diffs
   lazy val directRepresentation = diffs.scanLeft(0)(_ + _)
@@ -24,7 +24,7 @@ case class IndirectRuler(diffs: Seq[Int]) extends Ruler {
   lazy val length = directRepresentation.last
 }
 
-case class DirectRuler(positions: Seq[Int]) extends Ruler {
+case class DirectRuler(positions: IndexedSeq[Int]) extends Ruler {
 
   val directRepresentation = positions
   lazy val indirectRepresentation = {

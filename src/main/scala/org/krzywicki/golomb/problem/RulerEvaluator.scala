@@ -21,7 +21,7 @@ object RulerEvaluator {
    * 
    * This method computes the number of constraint violation, i.e. the number of repeated mark distances.
    */
-  def distanceViolations(marks: Array[Int]): Int = {
+  def distanceViolations(marks: IndexedSeq[Int]): Int = {
     val size = marks.length
 
     // For efficiency, we use an array to store the distances

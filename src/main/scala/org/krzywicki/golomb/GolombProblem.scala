@@ -1,13 +1,13 @@
 package org.krzywicki.golomb
 
-import org.apache.commons.math3.random.RandomDataGenerator
-import org.krzywicki.golomb.operators.{TabuSearchStrategy, OnePointCrossover, SegmentsLengthMutation}
+import org.krzywicki.golomb.operators.{OnePointCrossover, SegmentsLengthMutation, TabuSearchStrategy}
 import org.krzywicki.golomb.problem._
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
-import pl.edu.agh.scalamas.genetic.{GeneticTransformer, GeneticOps, GeneticProblem}
+import pl.edu.agh.scalamas.genetic.{GeneticOps, GeneticProblem}
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 import pl.edu.agh.scalamas.util.Util._
-import scala.collection.mutable.ArrayBuffer
+
+import scala.math.Ordering
 
 /**
  * Created by krzywick on 2015-04-01.
@@ -43,7 +43,7 @@ trait GolombProblem extends GeneticProblem with SegmentsLengthMutation with OneP
       val marks = possibleMarks.shuffled.take(countOfMarks - 2).toBuffer
       val position = random.nextInt(marks.size + 1)
       marks.insert(position, 1)
-      IndirectRuler(marks)
+      IndirectRuler(marks.toIndexedSeq)
     }
 
     def evaluate(solution: Solution) = - search(solution)
