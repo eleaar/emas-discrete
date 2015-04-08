@@ -1,66 +1,30 @@
 package org.krzywicki.golomb
 
-import org.krzywicki.golomb.operators.{OnePointCrossover, SegmentsLengthMutation, TabooSearchStrategy}
-import org.krzywicki.golomb.problem._
+import org.krzywicki.golomb.problem.Ruler
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
 import pl.edu.agh.scalamas.genetic.{GeneticOps, GeneticProblem}
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
-import pl.edu.agh.scalamas.util.Util._
 
-import scala.collection.mutable.ArrayBuffer
-import scala.math.Ordering
+trait GolombOps extends GeneticOps[GolombOps] {
 
-/**
- * Created by krzywick on 2015-04-01.
- */
+  type Solution = Ruler
+  type Evaluation = Int
 
-trait GolombProblem extends GeneticProblem with SegmentsLengthMutation with OnePointCrossover with TabooSearchStrategy {
+}
 
+trait GolombProblem extends GeneticProblem with GolombLocalSearchComponent with GolombTransformerComponent {
   this: AgentRuntimeComponent with RandomGeneratorComponent =>
 
   type Genetic = GolombOps
 
-  def genetic = new GolombOps
+  def genetic = Ops
 
   def config = agentRuntime.config.getConfig("genetic.golomb")
 
-  def countOfMarks: Int = config.getInt("countOfMarks")
-  def maxMarkSize: Int = config.getInt("maxMarkSize")
+  lazy val countOfMarks: Int = config.getInt("countOfMarks")
+  lazy val maxMarkSize: Int = config.getInt("maxMarkSize")
+  lazy val maxIterationCount = agentRuntime.config.getInt("genetic.golomb.iterationCount")
 
-  class GolombOps extends GeneticOps[GolombOps] {
-
-    type Solution = Ruler
-    type Evaluation = Int
-
-    // Mark '0' is illegal, mark '1' will be in ALL rulers, we need to permutate only n - 1 numbers
-    val possibleMarks = (2 to maxMarkSize).toList
-
-    def generate = {
-      implicit val shuffler = randomData
-
-      // TODO refactor this stuff
-      // This method generates INDIRECT representation. INDIRECT representation is shorter than DIRECT by one
-      // In next step we add mark '1' so we now must select n - 2 numbers
-      val marks = ArrayBuffer() ++ possibleMarks.shuffled.take(countOfMarks - 2)
-      val position = random.nextInt(marks.size + 1)
-      marks.insert(position, 1)
-      Ruler(marks)
-    }
-
-    def evaluate(solution: Solution) = search(solution)
-
-    val minimal = maxMarkSize * maxMarkSize / 2
-
-    val ordering = Ordering[Int].reverse
-
-    def transform(solution: Solution) = {
-      mutationStrategy.mutateSolution(solution)
-    }
-
-    def transform(solution1: Solution, solution2: Solution) = {
-      crossoverStrategy.recombine(solution1, solution2)
-    }
-
-  }
+  object Ops extends GolombOps with TabooSearch with GolombTransformer
 
 }
