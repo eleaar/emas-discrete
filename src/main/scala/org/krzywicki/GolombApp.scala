@@ -1,16 +1,16 @@
 package org.krzywicki
 
+import net.ceedubs.ficus.Ficus._
 import org.krzywicki.golomb.GolombProblem
-import pl.edu.agh.scalamas.app.SequentialStack
+import pl.edu.agh.scalamas.app.{ConcurrentStack, SynchronousEnvironment}
 import pl.edu.agh.scalamas.emas.EmasLogic
 
 import scala.concurrent.duration._
-import net.ceedubs.ficus.Ficus._
 
 /**
  * Created by krzywick on 2015-04-01.
  */
-object SequentialApp extends SequentialStack
+object GolombApp extends ConcurrentStack("golomb") with SynchronousEnvironment
 with EmasLogic
 with GolombProblem {
 

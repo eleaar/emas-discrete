@@ -10,4 +10,6 @@ libraryDependencies += "pl.edu.agh.scalamas" %% "emas" % "0.2.0-SNAPSHOT"
 
 libraryDependencies += "net.ceedubs" %% "ficus" % "1.1.1"
 
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.13"
+
 assemblyOutputPath in assembly := file("target/emas-discrete.jar")
