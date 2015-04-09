@@ -6,4 +6,6 @@ scalaVersion := "2.11.5"
 
 libraryDependencies += "pl.edu.agh.scalamas" %% "emas" % "0.1"
 
+libraryDependencies += "net.ceedubs" %% "ficus" % "1.1.1"
+
 assemblyOutputPath in assembly := file("target/emas-discrete.jar")

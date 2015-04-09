@@ -5,6 +5,7 @@ import pl.edu.agh.scalamas.app.SequentialStack
 import pl.edu.agh.scalamas.emas.EmasLogic
 
 import scala.concurrent.duration._
+import net.ceedubs.ficus.Ficus._
 
 /**
  * Created by krzywick on 2015-04-01.
@@ -14,7 +15,7 @@ with EmasLogic
 with GolombProblem {
 
   def main(args: Array[String]) {
-    run(10 seconds)
+    run(agentRuntime.config.as[FiniteDuration]("simulationDuration"))
   }
 
 }
