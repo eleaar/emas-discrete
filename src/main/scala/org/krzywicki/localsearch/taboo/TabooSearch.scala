@@ -41,16 +41,13 @@ trait TabooSearch {
               tabooList -= tabooList.head
             }
 
-            val (newBestSolution, newBestEvaluation) =
-              if (genetic.ordering.gt(bestChangeEvaluation, bestEvaluation)) {
-                (genetic.applyChange(bestSolution, bestChange), bestChangeEvaluation)
-              } else {
-                (bestSolution, bestEvaluation)
-              }
-            search0(iterationsLeft - 1, newBestSolution, newBestEvaluation, tabooList)
+            if (genetic.ordering.gt(bestChangeEvaluation, bestEvaluation)) {
+              val newBestSolution = genetic.applyChange(bestSolution, bestChange)
+              return search0(iterationsLeft - 1, newBestSolution, bestChangeEvaluation, tabooList)
+            }
           }
         }
-        (bestSolution, bestEvaluation)
+        return (bestSolution, bestEvaluation)
       }
       search0(maxIterations,
         solution,
