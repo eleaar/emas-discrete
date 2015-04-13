@@ -47,16 +47,16 @@ trait TabooSearch {
               } else {
                 (bestSolution, bestEvaluation)
               }
-            return search0(iterationsLeft - 1, newBestSolution, newBestEvaluation, tabooList)
+            search0(iterationsLeft - 1, newBestSolution, newBestEvaluation, tabooList)
           }
-          return (bestSolution, bestEvaluation)
         }
-        search0(maxIterations,
-          solution,
-          genetic.evaluate(solution),
-          new mutable.LinkedHashSet[Genetic#Change]()
-        )
+        (bestSolution, bestEvaluation)
       }
+      search0(maxIterations,
+        solution,
+        genetic.evaluate(solution),
+        new mutable.LinkedHashSet[Genetic#Change]()
+      )
     }
   }
 
