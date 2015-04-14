@@ -8,13 +8,13 @@ import scala.collection.mutable
 /**
  * Created by Daniel on 2015-04-08.
  */
-trait TabooSearch {
+trait TabooSearch extends LocalSearch {
 
   this: AgentRuntimeComponent with IncrementalGeneticProblem =>
 
   def localSearchStrategy = TabooSearchStrategy
 
-  object TabooSearchStrategy {
+  object TabooSearchStrategy extends LocalSearchStrategy {
 
     def config = agentRuntime.config.getConfig("genetic.taboo")
 
