@@ -13,5 +13,5 @@ trait LabsOps extends IncrementalGeneticOps[LabsOps]  {
 }
 
 object LabsOps {
-  case class Bitflip(idx: Int, flipper: OneBitFastFlipper)
+  case class Bitflip(idx: Int)
 }

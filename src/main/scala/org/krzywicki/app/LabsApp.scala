@@ -2,7 +2,7 @@ package org.krzywicki.app
 
 import net.ceedubs.ficus.Ficus._
 import org.krzywicki.labs.LabsProblem
-import org.krzywicki.localsearch.RandomMutationHillClimbing
+import org.krzywicki.localsearch.TabooSearch
 import pl.edu.agh.scalamas.app.SequentialStack
 import pl.edu.agh.scalamas.emas.EmasLogic
 
@@ -13,7 +13,7 @@ import scala.concurrent.duration.FiniteDuration
  */
 object LabsApp extends SequentialStack
 with EmasLogic
-with LabsProblem with RandomMutationHillClimbing {
+with LabsProblem with TabooSearch {
 
   def main(args: Array[String]) {
     run(agentRuntime.config.as[FiniteDuration]("simulationDuration"))
