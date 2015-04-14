@@ -14,7 +14,7 @@ trait TabooSearch extends LocalSearch {
 
   def localSearchStrategy = TabooSearchStrategy
 
-  object TabooSearchStrategy extends LocalSearchStrategy {
+  object TabooSearchStrategy extends LocalSearchStrategy[Genetic] {
 
     def config = agentRuntime.config.getConfig("genetic.taboo")
 
@@ -22,7 +22,7 @@ trait TabooSearch extends LocalSearch {
 
     val tabooSize = config.getInt("tabooSize")
 
-    def search(solution: Genetic#Solution) = {
+    def search(solution: Genetic#Solution, evaluation: Genetic#Evaluation) = {
       def search0(iterationsLeft: Int,
                   bestSolution: Genetic#Solution,
                   bestEvaluation: Genetic#Evaluation,
@@ -51,7 +51,7 @@ trait TabooSearch extends LocalSearch {
       }
       search0(maxIterations,
         solution,
-        genetic.evaluate(solution),
+        evaluation,
         new mutable.LinkedHashSet[Genetic#Change]()
       )
     }

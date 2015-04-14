@@ -12,13 +12,13 @@ trait RandomMutationHillClimbing extends LocalSearch {
 
   def localSearchStrategy = RandomMutationHillClimbingStrategy
 
-  object RandomMutationHillClimbingStrategy extends LocalSearchStrategy {
+  object RandomMutationHillClimbingStrategy extends LocalSearchStrategy[Genetic] {
 
     def config = agentRuntime.config.getConfig("genetic.rmhc")
 
     val maxIterations = config.getInt("maxIterations")
 
-    def search(solution: Genetic#Solution) = {
+    def search(solution: Genetic#Solution, evaluation: Genetic#Evaluation) = {
       def search0(iterationsLeft: Int,
                   possibleChanges: IndexedSeq[Genetic#Change],
                   bestSolution: Genetic#Solution,
@@ -43,7 +43,7 @@ trait RandomMutationHillClimbing extends LocalSearch {
       search0(maxIterations,
         genetic.possibleChanges(solution).toIndexedSeq,
         solution,
-        genetic.evaluate(solution))
+        evaluation)
     }
 
   }

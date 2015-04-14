@@ -11,13 +11,13 @@ trait SteepestDescend extends LocalSearch {
 
   def localSearchStrategy = SteepestDescendStrategy
 
-  object SteepestDescendStrategy extends LocalSearchStrategy {
+  object SteepestDescendStrategy extends LocalSearchStrategy[Genetic] {
 
     def config = agentRuntime.config.getConfig("genetic.sd")
 
     val maxIterations = config.getInt("maxIterations")
 
-    def search(solution: Genetic#Solution) = {
+    def search(solution: Genetic#Solution, evaluation: Genetic#Evaluation) = {
       def search0(iterationsLeft: Int,
                   bestSolution: Genetic#Solution,
                   bestEvaluation: Genetic#Evaluation): (Genetic#Solution, Genetic#Evaluation) = {
@@ -36,10 +36,9 @@ trait SteepestDescend extends LocalSearch {
         }
         return (bestSolution, bestEvaluation)
       }
-
       search0(maxIterations,
         solution,
-        genetic.evaluate(solution))
+        evaluation)
     }
 
   }
