@@ -1,48 +1,46 @@
 package org.krzywicki.golomb
 
+import org.apache.commons.math3.random.{RandomDataGenerator, RandomGenerator}
 import pl.edu.agh.scalamas.genetic.GeneticEvaluator
-import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 import pl.edu.agh.scalamas.util.Util._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.math.Ordering
 
-trait GolombEvaluatorComponent {
-
-  this: RandomGeneratorComponent =>
+trait GolombEvaluator extends GeneticEvaluator[GolombOps] {
 
   def countOfMarks: Int
+
   def maxMarkSize: Int
 
-  trait GolombEvaluator extends GeneticEvaluator[GolombOps] {
+  def randomData: RandomDataGenerator
 
-    // Mark '0' is illegal, mark '1' will be in ALL rulers, we need to permutate only n - 1 numbers
-    val possibleMarks = (2 to maxMarkSize).toList
+  def random: RandomGenerator
 
-    def generate = {
-      implicit val shuffler = randomData
+  // Mark '0' is illegal, mark '1' will be in ALL rulers, we need to permutate only n - 1 numbers
+  lazy val possibleMarks = (2 to maxMarkSize).toList
 
-      // TODO refactor this stuff
-      // This method generates INDIRECT representation. INDIRECT representation is shorter than DIRECT by one
-      // In next step we add mark '1' so we now must select n - 2 numbers
-      val marks = ArrayBuffer() ++ possibleMarks.shuffled.take(countOfMarks - 2)
-      val position = random.nextInt(marks.size + 1)
-      marks.insert(position, 1)
-      marks.toArray
-    }
+  def generate = {
+    implicit val shuffler = randomData
 
-    def evaluate(solution: GolombOps#Solution) = {
-      val marks = GolombEvaluator.decode(solution).toArray
-      val violations = GolombEvaluator.violations(marks)
-      GolombEvaluator.evaluateWithViolations(marks, violations)
-    }
-
-    val minimal = maxMarkSize * maxMarkSize / 2
-
-    val ordering = Ordering[Int].reverse
-
+    // TODO refactor this stuff
+    // This method generates INDIRECT representation. INDIRECT representation is shorter than DIRECT by one
+    // In next step we add mark '1' so we now must select n - 2 numbers
+    val marks = ArrayBuffer() ++ possibleMarks.shuffled.take(countOfMarks - 2)
+    val position = random.nextInt(marks.size + 1)
+    marks.insert(position, 1)
+    marks.toArray
   }
 
+  lazy val minimal = maxMarkSize * maxMarkSize / 2
+
+  lazy val ordering = Ordering[Int].reverse
+
+  def evaluate(solution: GolombOps#Solution) = {
+    val marks = GolombEvaluator.decode(solution).toArray
+    val violations = GolombEvaluator.violations(marks)
+    GolombEvaluator.evaluateWithViolations(marks, violations)
+  }
 }
 
 object GolombEvaluator {

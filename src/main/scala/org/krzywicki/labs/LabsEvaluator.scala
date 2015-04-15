@@ -13,9 +13,9 @@ trait LabsEvaluator extends GeneticEvaluator[LabsOps] {
 
   def generate = Array.fill(problemSize)(random.nextBoolean())
 
-  def minimal = 0.0
+  lazy val minimal = 0.0
 
-  def ordering = scala.math.Ordering.Double
+  lazy val ordering = scala.math.Ordering.Double
 
   def evaluate(s: LabsOps#Solution) = {
     val size = s.size

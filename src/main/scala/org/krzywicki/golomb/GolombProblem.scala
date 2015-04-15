@@ -1,29 +1,30 @@
 package org.krzywicki.golomb
 
+import org.krzywicki.localsearch.LocalSearch
+import org.krzywicki.problem.IncrementalGeneticProblem
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
-import pl.edu.agh.scalamas.genetic.{GeneticOps, GeneticProblem}
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 
-trait GolombOps extends GeneticOps[GolombOps] {
 
-  type Solution = Array[Int]
-  type Evaluation = Int
 
-}
-
-trait GolombProblem extends GeneticProblem with GolombLocalSearchComponent with GolombTransformerComponent {
-  this: AgentRuntimeComponent with RandomGeneratorComponent =>
+trait GolombProblem extends IncrementalGeneticProblem {
+  this: AgentRuntimeComponent with RandomGeneratorComponent with LocalSearch =>
 
   type Genetic = GolombOps
 
-  def genetic = Ops
+  def genetic = new GolombOps with GolombIncrementalEvaluator with GolombTransformer {
+    def config = agentRuntime.config.getConfig("genetic.golomb")
 
-  def config = agentRuntime.config.getConfig("genetic.golomb")
+    val countOfMarks: Int = config.getInt("countOfMarks")
+    val maxMarkSize: Int = config.getInt("maxMarkSize")
+    val maxIterationCount = agentRuntime.config.getInt("genetic.golomb.iterationCount")
 
-  lazy val countOfMarks: Int = config.getInt("countOfMarks")
-  lazy val maxMarkSize: Int = config.getInt("maxMarkSize")
-  lazy val maxIterationCount = agentRuntime.config.getInt("genetic.golomb.iterationCount")
+    def random = GolombProblem.this.random
+    def randomData = GolombProblem.this.randomData
 
-  object Ops extends GolombOps with TabooSearch with GolombTransformer
+    def localSearchStrategy = GolombProblem.this.localSearchStrategy
+  }
+
+
 
 }
