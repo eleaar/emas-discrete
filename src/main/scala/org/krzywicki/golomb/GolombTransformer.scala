@@ -5,7 +5,7 @@ import pl.edu.agh.scalamas.genetic.GeneticTransformer
 
 trait GolombTransformer extends GeneticTransformer[GolombOps] {
 
-  def maxMarkSize: Int
+  def maxMarkDistance: Int
 
   def randomData: RandomDataGenerator
 
@@ -28,7 +28,7 @@ trait GolombTransformer extends GeneticTransformer[GolombOps] {
     val diffsToKeep = indexesToKeep.map(diffs(_))
 
 
-    val randomDiffs = randomData.nextPermutation(maxMarkSize, maxMarkSize)
+    val randomDiffs = randomData.nextPermutation(maxMarkDistance, maxMarkDistance)
     val diffsToChooseFrom = randomDiffs.filter(!diffsToKeep.contains(_))
     val newDiffs = diffsToChooseFrom.distinct.take(diffsToChange)
 

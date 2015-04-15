@@ -1,0 +1,20 @@
+package org.krzywicki.app
+
+import org.krzywicki.app.Configs.{ConcurrentConfig, HybridConfig, SequentialConfig}
+import org.krzywicki.golomb.GolombProblem
+import org.krzywicki.localsearch._
+
+object GolombSequentialNoLocalSearch extends SequentialConfig with GolombProblem with NoLocalSearch
+object GolombSequentialTaboo extends SequentialConfig with GolombProblem with TabooSearch
+object GolombSequentialRMHC extends SequentialConfig with GolombProblem with RandomMutationHillClimbing
+object GolombSequentialSDLS extends SequentialConfig with GolombProblem with SteepestDescend
+
+object GolombHybridNoLocalSearch extends HybridConfig with GolombProblem with NoLocalSearch
+object GolombHybridTaboo extends HybridConfig with GolombProblem with TabooSearch
+object GolombHybridRMHC extends HybridConfig with GolombProblem with RandomMutationHillClimbing
+object GolombHybridSDLS extends HybridConfig with GolombProblem with SteepestDescend
+
+object GolombConcurrentNoLocalSearch extends ConcurrentConfig with GolombProblem with NoLocalSearch
+object GolombConcurrentTaboo extends ConcurrentConfig with GolombProblem with TabooSearch
+object GolombConcurrentRMHC extends ConcurrentConfig with GolombProblem with RandomMutationHillClimbing
+object GolombConcurrentSDLS extends ConcurrentConfig with GolombProblem with SteepestDescend

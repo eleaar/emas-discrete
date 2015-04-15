@@ -9,16 +9,16 @@ import scala.math.Ordering
 
 trait GolombEvaluator extends GeneticEvaluator[GolombOps] {
 
-  def countOfMarks: Int
+  def marksNumber: Int
 
-  def maxMarkSize: Int
+  def maxMarkDistance: Int
 
   def randomData: RandomDataGenerator
 
   def random: RandomGenerator
 
   // Mark '0' is illegal, mark '1' will be in ALL rulers, we need to permutate only n - 1 numbers
-  lazy val possibleMarks = (2 to maxMarkSize).toList
+  lazy val possibleMarks = (2 to maxMarkDistance).toList
 
   def generate = {
     implicit val shuffler = randomData
@@ -26,13 +26,13 @@ trait GolombEvaluator extends GeneticEvaluator[GolombOps] {
     // TODO refactor this stuff
     // This method generates INDIRECT representation. INDIRECT representation is shorter than DIRECT by one
     // In next step we add mark '1' so we now must select n - 2 numbers
-    val marks = ArrayBuffer() ++ possibleMarks.shuffled.take(countOfMarks - 2)
+    val marks = ArrayBuffer() ++ possibleMarks.shuffled.take(marksNumber - 2)
     val position = random.nextInt(marks.size + 1)
     marks.insert(position, 1)
     marks.toArray
   }
 
-  lazy val minimal = maxMarkSize * maxMarkSize / 2
+  lazy val minimal = maxMarkDistance * maxMarkDistance / 2
 
   lazy val ordering = Ordering[Int].reverse
 
