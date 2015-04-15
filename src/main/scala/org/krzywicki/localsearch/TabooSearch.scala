@@ -1,7 +1,7 @@
 package org.krzywicki.localsearch
 
-import org.krzywicki.problem.IncrementalGeneticProblem
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
+import pl.edu.agh.scalamas.genetic.GeneticProblem
 
 import scala.collection.mutable
 
@@ -10,7 +10,7 @@ import scala.collection.mutable
  */
 trait TabooSearch extends LocalSearch {
 
-  this: AgentRuntimeComponent with IncrementalGeneticProblem =>
+  this: AgentRuntimeComponent with GeneticProblem =>
 
   def localSearchStrategy = TabooSearchStrategy
 
@@ -22,18 +22,20 @@ trait TabooSearch extends LocalSearch {
 
     val tabooSize = config.getInt("tabooSize")
 
-    def search(solution: Genetic#Solution, evaluation: Genetic#Evaluation) = {
+    def evaluationOrdering = genetic.ordering
+
+    def search[C](baseEvaluation: Genetic#Evaluation, helper: LocalSearchHelper[C,Genetic]) = {
       def search0(iterationsLeft: Int,
-                  bestSolution: Genetic#Solution,
-                  bestEvaluation: Genetic#Evaluation,
-                  tabooList: mutable.LinkedHashSet[Genetic#Change]): (Genetic#Solution, Genetic#Evaluation) = {
+                  baseEvaluation: Genetic#Evaluation,
+                  helper: LocalSearchHelper[C,Genetic],
+                  tabooList: mutable.LinkedHashSet[C]): Genetic#Evaluation = {
         if (iterationsLeft > 0) {
-          val allChanges = genetic.possibleChanges(bestSolution)
+          val allChanges = helper.possibleChanges
           val allowedChanges = allChanges.filter(!tabooList.contains(_))
-          val evaluatedChanges = allowedChanges.map(c => (c, genetic.evaluateChange(bestSolution, c)))
+          val evaluatedChanges = allowedChanges.map(c => (c, helper.evaluateChange(c)))
 
           if (evaluatedChanges.nonEmpty) {
-            val (bestChange, bestChangeEvaluation) = evaluatedChanges.maxBy(_._2)(genetic.ordering)
+            val (bestChange, bestChangeEvaluation) = evaluatedChanges.maxBy(_._2)(evaluationOrdering)
 
             tabooList += bestChange
             if (tabooList.size > tabooSize) {
@@ -41,18 +43,18 @@ trait TabooSearch extends LocalSearch {
               tabooList -= tabooList.head
             }
 
-            if (genetic.ordering.gt(bestChangeEvaluation, bestEvaluation)) {
-              val newBestSolution = genetic.applyChange(bestSolution, bestChange)
-              return search0(iterationsLeft - 1, newBestSolution, bestChangeEvaluation, tabooList)
+            if (evaluationOrdering.gt(bestChangeEvaluation, baseEvaluation)) {
+              val newHelper = helper.applyChange(bestChange)
+              return search0(iterationsLeft - 1, bestChangeEvaluation, newHelper, tabooList)
             }
           }
         }
-        return (bestSolution, bestEvaluation)
+        return baseEvaluation
       }
       search0(maxIterations,
-        solution,
-        evaluation,
-        new mutable.LinkedHashSet[Genetic#Change]()
+        baseEvaluation,
+        helper,
+        new mutable.LinkedHashSet[C]()
       )
     }
   }

@@ -15,8 +15,8 @@ trait LabsIncrementalEvaluator extends LabsEvaluator with IncrementalGeneticEval
   lazy val flippers = new mutable.WeakHashMap[LabsOps#Solution, OneBitFastFlipper]
 
   override def evaluate(s: LabsOps#Solution) = {
-    val result = localSearchStrategy.search(s, super.evaluate(s))
-    result._2
+    localSearchStrategy.search(super.evaluate(s), new LabsLocalSearchHelper(s))
+
   }
 
   def possibleChanges(solution: LabsOps#Solution): Stream[LabsOps#Change] = {

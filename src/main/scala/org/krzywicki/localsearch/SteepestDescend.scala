@@ -1,13 +1,13 @@
 package org.krzywicki.localsearch
 
-import org.krzywicki.problem.IncrementalGeneticProblem
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
+import pl.edu.agh.scalamas.genetic.GeneticProblem
 
 /**
  * Created by Daniel on 2015-04-13.
  */
 trait SteepestDescend extends LocalSearch {
-  this: AgentRuntimeComponent with IncrementalGeneticProblem  =>
+  this: AgentRuntimeComponent with GeneticProblem  =>
 
   def localSearchStrategy = SteepestDescendStrategy
 
@@ -17,28 +17,30 @@ trait SteepestDescend extends LocalSearch {
 
     val maxIterations = config.getInt("maxIterations")
 
-    def search(solution: Genetic#Solution, evaluation: Genetic#Evaluation) = {
+    def evaluationOrdering = genetic.ordering
+
+    def search[C](baseEvaluation: Genetic#Evaluation, helper: LocalSearchHelper[C,Genetic]) = {
       def search0(iterationsLeft: Int,
-                  bestSolution: Genetic#Solution,
-                  bestEvaluation: Genetic#Evaluation): (Genetic#Solution, Genetic#Evaluation) = {
+                  baseEvaluation: Genetic#Evaluation,
+                  helper: LocalSearchHelper[C,Genetic]): Genetic#Evaluation = {
         if (iterationsLeft > 0) {
-          val allChanges = genetic.possibleChanges(bestSolution)
-          val evaluatedChanges = allChanges.map(c => (c, genetic.evaluateChange(bestSolution, c)))
+          val allChanges = helper.possibleChanges
+          val evaluatedChanges = allChanges.map(c => (c, helper.evaluateChange(c)))
 
           if (evaluatedChanges.nonEmpty) {
-            val (bestChange, bestChangeEvaluation) = evaluatedChanges.maxBy(_._2)(genetic.ordering)
+            val (bestChange, bestChangeEvaluation) = evaluatedChanges.maxBy(_._2)(evaluationOrdering)
 
-            if (genetic.ordering.gt(bestChangeEvaluation, bestEvaluation)) {
-              val newBestSolution = genetic.applyChange(bestSolution, bestChange)
-              return search0(iterationsLeft - 1, newBestSolution, bestChangeEvaluation)
+            if (evaluationOrdering.gt(bestChangeEvaluation, baseEvaluation)) {
+              val newHelper = helper.applyChange(bestChange)
+              return search0(iterationsLeft - 1, bestChangeEvaluation, newHelper)
             }
           }
         }
-        return (bestSolution, bestEvaluation)
+        return baseEvaluation
       }
       search0(maxIterations,
-        solution,
-        evaluation)
+        baseEvaluation,
+        helper)
     }
 
   }

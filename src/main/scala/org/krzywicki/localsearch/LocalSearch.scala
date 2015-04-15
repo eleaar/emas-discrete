@@ -13,5 +13,5 @@ trait LocalSearch {
 
 trait LocalSearchStrategy[G <: GeneticOps[G]] {
 
-  def search(solution: G#Solution, evaluation: G#Evaluation): (G#Solution, G#Evaluation)
+  def search[C](baseEvaluation: G#Evaluation, helper: LocalSearchHelper[C, G]): G#Evaluation
 }

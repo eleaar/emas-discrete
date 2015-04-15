@@ -14,11 +14,10 @@ trait GolombIncrementalEvaluator extends GolombEvaluator with IncrementalGenetic
 
   override def evaluate(s: GolombOps#Solution) = {
     val marks = GolombEvaluator.decode(s)
-    val violations = GolombEvaluator.violations(marks)
-    val evaluation = GolombEvaluator.evaluateWithViolations(marks, violations)
+    val helper = new GolombLocalSearchHelper(marks)
+    val baseEvaluation = super.evaluate(s)
 
-    val result = localSearchStrategy.search(marks, evaluation)
-    result._2
+    localSearchStrategy.search(baseEvaluation, helper)
   }
 
   def possibleChanges(solution: GolombOps#Solution): Stream[GolombOps#Change] = {

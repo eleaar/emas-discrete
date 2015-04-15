@@ -1,14 +1,14 @@
 package org.krzywicki.localsearch
 
-import org.krzywicki.problem.IncrementalGeneticProblem
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
+import pl.edu.agh.scalamas.genetic.GeneticProblem
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 
 /**
  * Created by Daniel on 2015-04-13.
  */
 trait RandomMutationHillClimbing extends LocalSearch {
-  this: AgentRuntimeComponent with IncrementalGeneticProblem with RandomGeneratorComponent =>
+  this: AgentRuntimeComponent with GeneticProblem with RandomGeneratorComponent =>
 
   def localSearchStrategy = RandomMutationHillClimbingStrategy
 
@@ -18,32 +18,33 @@ trait RandomMutationHillClimbing extends LocalSearch {
 
     val maxIterations = config.getInt("maxIterations")
 
-    def search(solution: Genetic#Solution, evaluation: Genetic#Evaluation) = {
+    def evaluationOrdering = genetic.ordering
+
+    def search[C](baseEvaluation: Genetic#Evaluation, helper: LocalSearchHelper[C,Genetic]) = {
       def search0(iterationsLeft: Int,
-                  possibleChanges: IndexedSeq[Genetic#Change],
-                  bestSolution: Genetic#Solution,
-                  bestEvaluation: Genetic#Evaluation): (Genetic#Solution, Genetic#Evaluation) = {
+                  baseEvaluation: Genetic#Evaluation,
+                  helper: LocalSearchHelper[C,Genetic],
+                  possibleChanges: IndexedSeq[C]): Genetic#Evaluation = {
         if (iterationsLeft > 0 && possibleChanges.nonEmpty) {
           val idx = random.nextInt(possibleChanges.size)
           val change = possibleChanges(idx)
-          val changeEvaluation = genetic.evaluateChange(bestSolution, change)
+          val newEvaluation = helper.evaluateChange(change)
 
-          if (genetic.ordering.gt(changeEvaluation, bestEvaluation)) {
-            val newBestSolution = genetic.applyChange(bestSolution, change)
-            val newPossibleChanges = genetic.possibleChanges(newBestSolution).toIndexedSeq
-            search0(iterationsLeft - 1, newPossibleChanges, newBestSolution, changeEvaluation)
+          if (evaluationOrdering.gt(newEvaluation, baseEvaluation)) {
+            val newHelper = helper.applyChange(change)
+            val newPossibleChanges = newHelper.possibleChanges.toIndexedSeq
+            return search0(iterationsLeft - 1, newEvaluation, newHelper, newPossibleChanges)
           } else {
             val newPossibleChanges = possibleChanges.take(idx) ++ possibleChanges.drop(idx + 1)
-            search0(iterationsLeft - 1, newPossibleChanges, bestSolution, bestEvaluation)
+            return search0(iterationsLeft - 1, baseEvaluation, helper, newPossibleChanges)
           }
         }
-        (bestSolution, bestEvaluation)
+        return baseEvaluation
       }
-
       search0(maxIterations,
-        genetic.possibleChanges(solution).toIndexedSeq,
-        solution,
-        evaluation)
+        baseEvaluation,
+        helper,
+        helper.possibleChanges.toIndexedSeq)
     }
 
   }

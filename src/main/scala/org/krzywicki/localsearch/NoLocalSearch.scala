@@ -12,7 +12,8 @@ trait NoLocalSearch extends LocalSearch {
 
   object NoLocalSearchStrategy extends LocalSearchStrategy[Genetic] {
 
-    def search(solution: Genetic#Solution, evaluation: Genetic#Evaluation) = (solution, evaluation)
+    def search[C](baseEvaluation: Genetic#Evaluation, helper: LocalSearchHelper[C, Genetic]) = baseEvaluation
+
   }
 
 }
