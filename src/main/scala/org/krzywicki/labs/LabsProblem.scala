@@ -1,19 +1,19 @@
 package org.krzywicki.labs
 
 import org.krzywicki.localsearch.LocalSearch
-import org.krzywicki.problem.IncrementalGeneticProblem
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
+import pl.edu.agh.scalamas.genetic.GeneticProblem
 import pl.edu.agh.scalamas.random.RandomGeneratorComponent
 
 /**
  * Created by Daniel on 2015-04-14.
  */
-trait LabsProblem extends IncrementalGeneticProblem {
+trait LabsProblem extends GeneticProblem {
   this: AgentRuntimeComponent with RandomGeneratorComponent with LocalSearch =>
 
   type Genetic = LabsOps
 
-  def genetic = new LabsOps with LabsIncrementalEvaluator with LabsTransformer {
+  def genetic = new LabsOps with LabsEvaluator with LabsTransformer with LabsLocalSearch {
     def config = agentRuntime.config.getConfig("genetic.labs")
 
     val problemSize = config.getInt("problemSize")

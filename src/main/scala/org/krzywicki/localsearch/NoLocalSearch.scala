@@ -1,12 +1,12 @@
 package org.krzywicki.localsearch
 
-import org.krzywicki.problem.IncrementalGeneticProblem
+import pl.edu.agh.scalamas.genetic.GeneticProblem
 
 /**
  * Created by Daniel on 2015-04-15.
  */
 trait NoLocalSearch extends LocalSearch {
-  this: IncrementalGeneticProblem =>
+  this: GeneticProblem =>
 
   def localSearchStrategy = NoLocalSearchStrategy
 

@@ -11,9 +11,6 @@ object GolombLocalSearchHelper {
 
 }
 
-/**
- * Created by Daniel on 2015-04-15.
- */
 class GolombLocalSearchHelper(marks: Array[Int]) extends LocalSearchHelper[MarkChange, GolombOps] {
 
   lazy val distances = GolombEvaluator.distancesMap(marks)
