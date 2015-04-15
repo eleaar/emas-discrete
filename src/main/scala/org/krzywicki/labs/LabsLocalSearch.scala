@@ -12,10 +12,10 @@ object LabsLocalSearch {
 
 trait LabsLocalSearch extends GeneticEvaluator[LabsOps] {
 
-  def localSearchStrategy: LocalSearchStrategy[LabsOps]
+  def localSearchStrategy: LocalSearchStrategy
 
   abstract override def evaluate(s: LabsOps#Solution) = {
-    localSearchStrategy.search(super.evaluate(s), new LabsLocalSearchHelper(s))
+    localSearchStrategy.search(super.evaluate(s), new LabsLocalSearchHelper(s))(ordering)
   }
 }
 

@@ -14,14 +14,14 @@ object GolombLocalSearch {
 
 trait GolombLocalSearch extends GeneticEvaluator[GolombOps] {
 
-  def localSearchStrategy: LocalSearchStrategy[GolombOps]
+  def localSearchStrategy: LocalSearchStrategy
 
   abstract override def evaluate(s: GolombOps#Solution) = {
     val marks = GolombEvaluator.decode(s)
     val helper = new GolombLocalSearchHelper(marks)
     val baseEvaluation = super.evaluate(s)
 
-    localSearchStrategy.search(baseEvaluation, helper)
+    localSearchStrategy.search(baseEvaluation, helper)(ordering)
   }
 }
 

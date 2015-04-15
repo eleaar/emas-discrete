@@ -1,6 +1,6 @@
 package org.krzywicki.localsearch
 
-import pl.edu.agh.scalamas.genetic.{GeneticOps, GeneticProblem}
+import pl.edu.agh.scalamas.genetic.GeneticProblem
 
 /**
  * Created by Daniel on 2015-04-13.
@@ -8,10 +8,7 @@ import pl.edu.agh.scalamas.genetic.{GeneticOps, GeneticProblem}
 trait LocalSearch {
   this: GeneticProblem =>
 
-  def localSearchStrategy: LocalSearchStrategy[Genetic]
+  def localSearchStrategy: LocalSearchStrategy
 }
 
-trait LocalSearchStrategy[G <: GeneticOps[G]] {
 
-  def search[C](baseEvaluation: G#Evaluation, helper: LocalSearchHelper[C, G]): G#Evaluation
-}
