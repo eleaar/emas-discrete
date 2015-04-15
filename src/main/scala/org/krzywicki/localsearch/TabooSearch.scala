@@ -1,7 +1,7 @@
 package org.krzywicki.localsearch
 
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
-import pl.edu.agh.scalamas.genetic.{GeneticOps, GeneticProblem}
+import pl.edu.agh.scalamas.genetic.GeneticOps
 
 import scala.collection.mutable
 
@@ -9,8 +9,7 @@ import scala.collection.mutable
  * Created by Daniel on 2015-04-08.
  */
 trait TabooSearch extends LocalSearch {
-
-  this: AgentRuntimeComponent with GeneticProblem =>
+  this: AgentRuntimeComponent =>
 
   def localSearchStrategy = TabooSearchStrategy
 
@@ -22,10 +21,10 @@ trait TabooSearch extends LocalSearch {
 
     val tabooSize = config.getInt("tabooSize")
 
-    def search[C, G <: GeneticOps[G]](baseEvaluation: G#Evaluation, helper: LocalSearchHelper[C,G])(implicit ordering: Ordering[G#Evaluation]) = {
+    def search[C, G <: GeneticOps[G]](baseEvaluation: G#Evaluation, helper: LocalSearchHelper[C, G])(implicit ordering: Ordering[G#Evaluation]) = {
       def search0(iterationsLeft: Int,
                   baseEvaluation: G#Evaluation,
-                  helper: LocalSearchHelper[C,G],
+                  helper: LocalSearchHelper[C, G],
                   tabooList: mutable.LinkedHashSet[C]): G#Evaluation = {
         if (iterationsLeft > 0) {
           val allChanges = helper.possibleChanges

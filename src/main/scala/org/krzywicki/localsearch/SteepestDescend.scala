@@ -1,13 +1,13 @@
 package org.krzywicki.localsearch
 
 import pl.edu.agh.scalamas.app.AgentRuntimeComponent
-import pl.edu.agh.scalamas.genetic.{GeneticOps, GeneticProblem}
+import pl.edu.agh.scalamas.genetic.GeneticOps
 
 /**
  * Created by Daniel on 2015-04-13.
  */
 trait SteepestDescend extends LocalSearch {
-  this: AgentRuntimeComponent with GeneticProblem  =>
+  this: AgentRuntimeComponent =>
 
   def localSearchStrategy = SteepestDescendStrategy
 
@@ -17,10 +17,10 @@ trait SteepestDescend extends LocalSearch {
 
     val maxIterations = config.getInt("maxIterations")
 
-    def search[C,G <: GeneticOps[G]](baseEvaluation: G#Evaluation, helper: LocalSearchHelper[C,G])(implicit ordering: Ordering[G#Evaluation]) = {
+    def search[C, G <: GeneticOps[G]](baseEvaluation: G#Evaluation, helper: LocalSearchHelper[C, G])(implicit ordering: Ordering[G#Evaluation]) = {
       def search0(iterationsLeft: Int,
                   baseEvaluation: G#Evaluation,
-                  helper: LocalSearchHelper[C,G]): G#Evaluation = {
+                  helper: LocalSearchHelper[C, G]): G#Evaluation = {
         if (iterationsLeft > 0) {
           val allChanges = helper.possibleChanges
           val evaluatedChanges = allChanges.map(c => (c, helper.evaluateChange(c)))
