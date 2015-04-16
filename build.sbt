@@ -12,4 +12,6 @@ libraryDependencies += "net.ceedubs" %% "ficus" % "1.1.1"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.13"
 
+mainClass in assembly := None
+
 assemblyOutputPath in assembly := file(s"target/${mainClass.value.getOrElse("emas")}.jar")
