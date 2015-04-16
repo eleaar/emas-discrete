@@ -12,6 +12,4 @@ libraryDependencies += "net.ceedubs" %% "ficus" % "1.1.1"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.13"
 
-assemblyOutputPath in assembly := file("target/emas-discrete.jar")
-
-mainClass in assembly := Some("org.krzywicki.LabsApp")
+assemblyOutputPath in assembly := file(s"target/${mainClass.value.getOrElse("emas")}.jar")
