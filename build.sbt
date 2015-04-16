@@ -14,4 +14,4 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.13"
 
 mainClass in assembly := None
 
-assemblyOutputPath in assembly := file(s"target/${mainClass.value.getOrElse("emas")}.jar")
+assemblyOutputPath in assembly := file(s"target/${(mainClass in assembly).value.getOrElse("emas")}.jar")
